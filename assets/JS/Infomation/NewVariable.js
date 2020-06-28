@@ -60,14 +60,15 @@ class GameVarible
     calculateGameVar(  ){
 
         this.updateSIR(curr[6], curr[7], curr[8], beta0, gamma0, curr[16])
-        this.updateND(I, curr[16], curr[12], curr[13])
-        this.updateHealth(I0, I, If)
+        this.updateND(this.I, curr[16], curr[12], curr[13])
+        this.updateHealth(this.I0, this.I, this.If)
         this.updateResources(curr[14], curr[1], curr[17])
         this.updateFinancials(curr[2], curr[18])
         this.updateSupport(curr[3], curr[15])
         this.updateQuarantine(curr[9], curr[10], curr[11])
-        curr = [Health, Resources, Financials, Support, beta0, gamma0, 
-                S0, I0, R0, qc, qr, qn, D0, dDdt, prod0, dsup0, N, redaily, findaily]
+        curr = [this.Health, this.Resources, this.Financials, this.Support, this.beta0, this.gamma0, 
+                this.S0, this.I0, this.R0, this.qc, this.qr, this.qn, this.D0, this.dDdt, this.prod0, 
+                this.dsup0, this.N, this.redaily, this.findaily]
     }
     
     captureCardChangedVal( cardChangedVal )
@@ -136,24 +137,24 @@ class GameVarible
     // Assume the medical resources can support 5% of the population, if we go beyond that threshold, the death rate goes up 0.001 per percentage point
     // This condition is arbitrary.
     if ((I/N) > 0.05)
-        dDdt += 0.001 * ((I/N) - 0.05);
-    //return dDdt
+        this.dDdt += 0.001 * ((I/N) - 0.05);
+    return;
     }
 
     updateND(I, N, D, dDdt)
     {
     dDdt = this.updatedD(I, N, dDdt)
-    D = I * dDdt
-    N = N - D
-    //return N, D
+    this.D = I * dDdt
+    this.N = N - D
+    return;
     }
 
     deriv(S, I, R, N, beta, gamma)
     {
-    dSdt = -beta * S * I / N
-    dIdt = beta * S * I / N - gamma * I
-    dRdt = gamma * I
-    //return {ds:dSdt, di:dIdt, dr:dRdt}
+    this.dSdt = -beta * S * I / N
+    this.dIdt = beta * S * I / N - gamma * I
+    this.dRdt = gamma * I
+    return;
     }
 
     updateSIR(S0, I0, R0, beta, gamma, N)
@@ -163,50 +164,52 @@ class GameVarible
     this.deriv(S0, I0, R0, N, beta, gamma)
     
     // delta t = 1
-    S = dSdt + S0
-    I = dIdt + I0
-    R = dRdt + R0
-    //return S, I, R
+    this.S0 = dSdt + S0
+    this.I0 = dIdt + I0
+    this.R0 = dRdt + R0
+    return;
     }
 
     updateHealth(I0, I, If){
     if (I >= 1)
-        return 100 - Math.max((Math.log2(I) - Math.log2(I0))/
+        this.Health = 100 - Math.max((Math.log2(I) - Math.log2(I0))/
                     (Math.log2(If)- Math.log2(I0))*100, 1)
-    else   return 99
+    else   this.Health = 99
+    return;
     }
 
     updatedsup(dsup, I, N)
     {
     if ((I/N)< 0.1)
-        dsup = 0.3;
+        this.dsup = 0.3;
     else
-        dsup = -1;
-    //return dsup;
+        this.dsup = -1;
+    return;
     }
 
     updateSupport(Support, dsup)
     {
-    Support = Support + dsup
-    //return Support, dsup
+    this.Support = Support + dsup;
+    this.dsup = dsup;
+    return;
     }
 
     updateFinancials(Financials, findaily)
     {
-    Financials = Financials + findaily
-    //return Financials
+    this.Financials = Financials + findaily
+    return;
     }
 
     updateResources(prod, Resources, redaily)
     {
-    Resources = Resources - redaily + prod
-    //return Resources
+    this.Resources = Resources - redaily + prod
+    return;
     }
 
     updateQuarantine(qc, qr, qn)
     {
-    qn = Math.min(qc, (qr * I))
-    //return qc, qr, qn
+    this.qn = Math.min(qc, (qr * I))
+    return;
     }
 
 
